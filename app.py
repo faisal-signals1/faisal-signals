@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import numpy as np
-from datetime import datetime
+_configfrom datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 import plotly.graph_objects as go
 import time
@@ -20,7 +20,8 @@ PAIRS = {
     "EUR/GBP": "EURGBP=X",
     "USD/JPY": "USDJPY=X",
     "GBP/USD": "GBPUSD=X",
-    "AUD/USD": "AUDUSD=X",
+    "A(
+UD/USD": "AUDUSD=X",
     "USD/CAD": "USDCAD=X",
 }
 
@@ -32,8 +33,7 @@ TIMEFRAMES = {
     "30 دقيقة": "30m",
 }
 
-st.set_page_config(
-    page_title=f"{BRAND_NAME} | إشارات",
+st.set_page    page_title=f"{BRAND_NAME} | إشارات",
     page_icon="🦈",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -150,7 +150,9 @@ def fetch(symbol, interval):
             df.columns = df.columns.get_level_values(0)
         return df
     except Exception:
-        return pd.DataFrame()def analyze(symbol, interval):
+        return pd.DataFrame()
+
+ def analyze(symbol, interval):
     df = fetch(symbol, interval)
     if df.empty or len(df) < 60:
         return None
@@ -272,7 +274,9 @@ def get_timeframe_seconds(interval):
 def seconds_until_candle_end(interval):
     sec = get_timeframe_seconds(interval)
     now = time.time()
-    return int(sec - (now % sec))st.markdown("""
+    return int(sec - (now % sec))
+
+    st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
 html, body, [class*="css"] { font-family: 'Cairo', sans-serif !important; }
@@ -336,7 +340,9 @@ h3 { color: #00d4ff !important; font-weight: 700 !important; letter-spacing: 1px
     .mini-pair { font-size: 14px !important; }
 }
 </style>
-""", unsafe_allow_html=True)st.markdown(f"""
+""", unsafe_allow_html=True)
+
+  st.markdown(f"""
 <div class="brand-header">
     <div class="brand-name">{BRAND_NAME}</div>
     <div class="brand-sub">{BRAND_SUB}</div>
@@ -529,4 +535,4 @@ st.markdown(f"""
     ⚠️ تحليل آلي وليس نصيحة استثمارية. التداول فيه مخاطرة.<br>
     {BRAND_NAME} © {datetime.now().year} — by فيصل
 </div>
-""", unsafe_allow_html=True)
+""", unsafe_allow_html=True)  
