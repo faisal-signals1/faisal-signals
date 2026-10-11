@@ -2,7 +2,8 @@ import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = "ضع_التوكن_الخاص_بك_هنا"
+TOKEN = 8784240051:AAEdP800GRXEel0BMgDcoL4pngDzShQjI7E
+
 
 def generate_signal_text():
     pairs = ["EUR/USD (OTC)", "GBP/USD (OTC)", "USD/PKR (OTC)", "USD/BDT (OTC)", "EUR/GBP (OTC)", "AUD/CAD (OTC)"]
