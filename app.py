@@ -2,7 +2,8 @@ import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-TOKEN = 8784240051:AAEdP800GRXEel0BMgDcoL4pngDzShQjI7E
+TOKEN = "8784240051:AAEdP800GRXEel0BMgDcoL4pngDzShQjI7E"
+
 
 
 def generate_signal_text():
