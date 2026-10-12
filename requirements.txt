@@ -1,6 +1,1 @@
-streamlit
-yfinance
-pandas
-numpy
-streamlit-autorefresh
-plotly
+python-telegram-bot
