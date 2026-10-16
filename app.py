@@ -1,26 +1,33 @@
 import os
-import random
+import requests
 import pandas as pd
-import numpy as np
 from telegram import Bot
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
+TWELVE_DATA_API_KEY = os.environ.get("TWELVE_DATA_API_KEY")
+SYMBOL = "EUR/USD" # يمكنك تغييره لاحقاً لأي زوج آخر
 
-def get_mock_data():
-    # توليد بيانات تجريبية لمحاكاة سوق OTC
-    dates = pd.date_range(end=pd.Timestamp.now(), periods=100, freq='1min')
-    prices = [1.0850]
-    for _ in range(99):
-        prices.append(prices[-1] + random.uniform(-0.001, 0.001))
+def get_real_data(symbol):
+    # جلب البيانات الحقيقية من Twelve Data
+    url = f"https://api.twelvedata.com/time_series?symbol={symbol}&interval=1min&outputsize=100&apikey={TWELVE_DATA_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
     
-    df = pd.DataFrame({
-        'close': prices
-    }, index=dates)
+    # التحقق من وجود أخطاء في الاتصال
+    if 'values' not in data:
+        print("خطأ في جلب البيانات:", data.get('message', 'سبب غير معروف'))
+        return None
+        
+    df = pd.DataFrame(data['values'])
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.set_index('datetime')
+    df = df.astype(float)
+    df = df.sort_index()
     return df
 
 def calculate_indicators(df):
-    # حساب المؤشرات
+    # حساب المؤشرات الفنية
     df['EMA_20'] = df['close'].ewm(span=20, adjust=False).mean()
     df['EMA_50'] = df['close'].ewm(span=50, adjust=False).mean()
     
@@ -44,14 +51,12 @@ def generate_signal(df):
     prev = df.iloc[-2]
     
     # استراتيجية Triple Confirmation
-    # شراء: RSI < 30، EMA20 > EMA50، تقاطع MACD صعودي
     buy_condition = (
         last['RSI'] < 30 and
         last['EMA_20'] > last['EMA_50'] and
         last['MACD'] > last['MACD_Signal'] and prev['MACD'] <= prev['MACD_Signal']
     )
     
-    # بيع: RSI > 70، EMA20 < EMA50، تقاطع MACD هبوطي
     sell_condition = (
         last['RSI'] > 70 and
         last['EMA_20'] < last['EMA_50'] and
@@ -65,8 +70,13 @@ def generate_signal(df):
     return None
 
 def main():
-    print("جاري تحليل السوق...")
-    df = get_mock_data()
+    print(f"جاري تحليل السوق لـ {SYMBOL}...")
+    df = get_real_data(SYMBOL)
+    
+    if df is None or df.empty:
+        print("فشل في جلب البيانات. تأكد من صحة مفتاح API.")
+        return
+
     df = calculate_indicators(df)
     signal = generate_signal(df)
     
@@ -74,15 +84,11 @@ def main():
     
     if signal:
         price = df['close'].iloc[-1]
-        message = f"🚨 إشارة جديدة!\n\nالزوج: EURUSD_otc\nالإشارة: {signal}\nالسعر: {price:.5f}\nالإطار الزمني: 1 دقيقة"
+        message = f"🚨 إشارة جديدة!\n\nالزوج: {SYMBOL}\nالإشارة: {signal}\nالسعر: {price:.5f}\nالإطار الزمني: 1 دقيقة"
         bot.send_message(chat_id=CHAT_ID, text=message)
         print(f"تم إرسال الإشارة: {signal}")
     else:
-        print("لا توجد إشارات حالياً.")
-        # يمكنك إرسال رسالة تأكيد فقط عند التشغيل اليدوي
-        # bot.send_message(chat_id=CHAT_ID, text="✅ البوت يعمل، لكن لا توجد إشارة حالياً.")
-    
-    print("انتهى التحليل.")
+        print("لا توجد إشارات حالياً. شروط الاستراتيجية لم تتحقق.")
 
 if __name__ == '__main__':
     main()
