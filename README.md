@@ -1,2 +1,3 @@
-# faisal-signals
-My trading signals app
+python-telegram-bot
+pandas
+numpy
