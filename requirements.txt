@@ -2,3 +2,4 @@ python-telegram-bot
 pandas
 numpy
 requests
+otcharts
